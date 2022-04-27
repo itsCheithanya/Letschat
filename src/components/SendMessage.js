@@ -1,0 +1,52 @@
+import React from 'react'
+import { useState } from 'react'
+import { auth, db } from '../firebase'
+import firebase from 'firebase'
+
+function SendMessage({ scroll }) {
+  const [msg, setmsg] = useState('')
+  async function updatedb(e) {
+    e.preventDefault()
+    const { uid, photoURL } = auth.currentUser
+    await db.collection('chat-messages').add({
+      text: msg,
+      photoURL,
+      uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    })
+    setmsg('')
+    scroll.current.scrollIntoView({ behavior: 'smooth' })
+  }
+  return (
+    <>
+      <form onSubmit={updatedb}>
+        <input
+          style={{
+            width: '70%',
+            fontSize: '15px',
+            fontWeight: '550',
+            marginLeft: '5px',
+            marginBottom: '-3px',
+          }}
+          value={msg}
+          placeholder={'Message..'}
+          onChange={(e) => setmsg(e.target.value)}
+        />
+        <button
+          style={{
+            width: '18%',
+            fontSize: '15px',
+            fontWeight: '550',
+            margin: '4px 5% -13px 5%',
+            maxWidth: '200px',
+          }}
+          type='submit'
+        >
+          Send
+        </button>
+      </form>
+    </>
+  )
+}
+
+export default SendMessage
